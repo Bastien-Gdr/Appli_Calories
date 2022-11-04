@@ -19,9 +19,9 @@ const ItemCtrl = (function(){
 
     const data = {
         items : [
-            {id : 0,name : 'Pain',calories : 245},
-            {id : 1,name : 'Orange',calories : 45},
-            {id : 2,name : 'Poulet',calories : 100}
+            // {id : 0,name : 'Pain',calories : 245},
+            // {id : 1,name : 'Orange',calories : 45},
+            // {id : 2,name : 'Poulet',calories : 100}
         ],
 
         currentItem : null,
@@ -32,6 +32,60 @@ const ItemCtrl = (function(){
     // Public
 
     return {
+
+        getItems : function(){
+            return data.items;
+        },
+
+        addItem : function(name,calories){
+            // console.log(name,calories);
+
+            let ID;
+
+            // Générer un id 
+            if(data.items.length > 0){
+                ID = data.items[data.items.length - 1].id + 1;
+            }else{
+
+                ID = 0;
+            }
+
+            // Convertir les calories en INT 
+
+            calories = parseInt(calories);
+
+            // Créer un nouveau objet item
+
+            newItem = new Item(ID, name, calories);
+
+            // Ajout de l'élément dans le tableau
+
+            data.items.push(newItem);
+
+            return newItem;
+
+        },
+
+        getTotalCalories : function(){
+            let total = 0;
+
+            // boucle
+
+            data.items.forEach(function(item){
+
+                total += item.calories;
+                
+                // Ajout du total dans la structure de donnée      
+            });
+            
+            data.totalCalories = total;
+
+            // Retourner le total
+
+            return data.totalCalories;
+
+        },
+
         logData : function(){
             return data;
         }
@@ -46,8 +100,88 @@ const ItemCtrl = (function(){
 
 const UiCtrl = (function(){
 
+    const UiSelectors = {
+        itemList : '#item-list',
+        addBtn : '.add-btn',
+        itemNameInput : '#aliment',
+        itemCaloriesInput : '#calories',
+        totalCalories : '.total-calories'
+    }
+
     // Méthode publiques
     return{
+        populateItemList : function(items){
+            let html = '';
+
+            items.forEach(function(item){
+                html += `<li class="list-group-item" id="item-${item.id}">
+                            <strong>${item.name} :</strong> <em>${item.calories} calories</em>
+                            <a href=""><i class="fas fa-pencil-alt"></i></a>
+                        </li>`
+            });
+
+            document.querySelector(UiSelectors.itemList).innerHTML = html;
+        },
+
+        getItemInput : function(){
+            return{
+                // Retourne un objet avec des options d'où les ':'
+                name : document.querySelector(UiSelectors.itemNameInput).value,
+                calories : document.querySelector(UiSelectors.itemCaloriesInput).value
+            }
+        },
+
+        addListItem : function(item){
+
+            // Montrer la liste
+
+            document.querySelector(UiSelectors.itemList).style.display = 'block';
+
+            // Création d'un élément <li>
+
+            const li = document.createElement('li');
+
+            // Ajouter une classe à la <li>
+
+            li.className = 'list-group-item';
+
+            // Ajouter un identifiant
+
+            li.id = `item-${item.id}`
+
+            // Ajouter au HTML
+
+            li.innerHTML = `<strong>${item.name} :</strong> <em>${item.calories} calories</em>
+                            <a href=""><i class="fas fa-pencil-alt"></i></a>`
+
+            // Rattacher les li à la ul (#item-list)
+
+            document.querySelector(UiSelectors.itemList).insertAdjacentElement('beforeend',li);
+
+        },
+
+        clearInput : function(){
+
+            document.querySelector(UiSelectors.itemNameInput).value = '';
+            document.querySelector(UiSelectors.itemCaloriesInput).value = '';
+            
+        },
+
+        hideList : function(){
+
+            document.querySelector(UiSelectors.itemList).style.display = 'none';
+
+        },
+
+        showTotalCalories : function(totalCalories){
+
+            document.querySelector(UiSelectors.totalCalories).textContent = totalCalories;
+
+        },
+
+        getSelectors : function(){
+            return UiSelectors;
+        }
 
     }
 
@@ -59,10 +193,78 @@ const App = (function(ItemCtrl,UiCtrl){
 
    // console.log(ItemCtrl.logData());
 
+   const loadEventListeners = function(){
+
+        // Séléctionner le sélécteur approprié
+        const UiSelectors = UiCtrl.getSelectors();
+
+        // Ajouter l'évènement
+        document.querySelector(UiSelectors.addBtn).addEventListener('click',itemAddSubmit)
+
+
+        // Récupération des éléments dans le champs
+
+   }
+
+   const itemAddSubmit = function(e){
+
+        const input = UiCtrl.getItemInput();
+
+        // Vérification des champs
+        if(input.name !== '' && input.calories !== ''){
+
+            const newItem = ItemCtrl.addItem(input.name,input.calories)
+        }
+
+        //console.log('Ajout ok');
+        // Ajouter l'élément à l'UI
+
+        UiCtrl.addListItem(newItem);
+
+        // Obtenir le total de calories
+
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Afficher le total sur l'UI
+
+        UiCtrl.showTotalCalories(totalCalories);
+
+        // Suppression des valeurs contenue dans les champs
+
+        UiCtrl.clearInput();
+
+        e.preventDefault();
+
+   }
+
     // Méthodes publiques
     return{
         init : function(){
-            console.log('Application en cours d\'execution');
+            // Parcours et obtient les données
+            const items = ItemCtrl.getItems();
+
+            // Vérifier si la lsite possède des éléments
+            if(items.length === 0){
+
+                UiCtrl.hideList();
+
+            }else{
+
+                // Peupler la liste (ul) avec des éléments (items)
+                UiCtrl.populateItemList(items);
+            }
+
+               // Obtenir le total de calories
+
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Afficher le total sur l'UI
+
+        UiCtrl.showTotalCalories(totalCalories);
+
+            // Lancement de la fonction LoadEventListeners
+
+            loadEventListeners();
         }
     }
 })(ItemCtrl,UiCtrl); // Sert à charger les deux controlleur automatiquement et donc pouvoir acceder à toutes les méthodes publiques

@@ -103,6 +103,9 @@ const UiCtrl = (function(){
     const UiSelectors = {
         itemList : '#item-list',
         addBtn : '.add-btn',
+        deleteBtn : '.delete-btn',
+        updateBtn : '.update-btn',
+        backBtn : '.back-btn',
         itemNameInput : '#aliment',
         itemCaloriesInput : '#calories',
         totalCalories : '.total-calories'
@@ -179,6 +182,24 @@ const UiCtrl = (function(){
 
         },
 
+        clearEditState : function(){
+
+            document.querySelector(UiSelectors.updateBtn).style.display = 'none';
+            document.querySelector(UiSelectors.deleteBtn).style.display = 'none';
+            document.querySelector(UiSelectors.backBtn).style.display = 'none';
+            document.querySelector(UiSelectors.addBtn).style.display = 'inline';
+
+        },
+
+        showEditState : function(){
+
+            document.querySelector(UiSelectors.updateBtn).style.display = 'inline';
+            document.querySelector(UiSelectors.deleteBtn).style.display = 'inline';
+            document.querySelector(UiSelectors.backBtn).style.display = 'inline';
+            document.querySelector(UiSelectors.addBtn).style.display = 'none';
+
+        },
+
         getSelectors : function(){
             return UiSelectors;
         }
@@ -240,6 +261,11 @@ const App = (function(ItemCtrl,UiCtrl){
     // Méthodes publiques
     return{
         init : function(){
+
+            // Gestion des boutons
+
+            UiCtrl.clearEditState();
+
             // Parcours et obtient les données
             const items = ItemCtrl.getItems();
 

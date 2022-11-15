@@ -66,6 +66,28 @@ const ItemCtrl = (function(){
 
         },
 
+        getItemById : function(id){
+
+            let found = null;
+
+            // boucle parmi les éléments
+
+            data.items.forEach(function(item){
+                if(item.id === id){
+                    found = item;
+                }
+            });
+
+            return found;
+
+        },
+
+        setCurrentItem : function(item){
+
+            data.currentItem = item;
+
+        },
+
         getTotalCalories : function(){
             let total = 0;
 
@@ -150,12 +172,12 @@ const UiCtrl = (function(){
 
             // Ajouter un identifiant
 
-            li.id = `item-${item.id}`
+            li.id = `item-${item.id}`;
 
             // Ajouter au HTML
 
             li.innerHTML = `<strong>${item.name} :</strong> <em>${item.calories} calories</em>
-                            <a href=""><i class="fas fa-pencil-alt"></i></a>`
+                            <a href="#"><i class="fas fa-pencil-alt edit-item"></i></a>`;
 
             // Rattacher les li à la ul (#item-list)
 
@@ -223,7 +245,9 @@ const App = (function(ItemCtrl,UiCtrl){
         document.querySelector(UiSelectors.addBtn).addEventListener('click',itemAddSubmit)
 
 
-        // Récupération des éléments dans le champs
+        // Editer en cliquant sur les li qui contiennent le crayon
+
+        document.querySelector(UiSelectors.itemList).addEventListener('click',itemUpdateSubmit);
 
    }
 
@@ -255,6 +279,32 @@ const App = (function(ItemCtrl,UiCtrl){
         UiCtrl.clearInput();
 
         e.preventDefault();
+
+   }
+
+   // MAJ des éléments
+   const itemUpdateSubmit = function(e){
+
+        if(e.target.classList.contains('edit-item')){
+            // On va chercher l'id de l'élément ciblé item-0 item-1...
+
+            const listId = e.target.parentNode.parentNode.id;
+
+            // Mettre l'id dans un tableau en 2 parties : item et le nombre
+
+            const listIdArr = listId.split('-');
+
+            // Obtenir l'id actuel (le convertir en nombre)
+
+            const id = parseInt(listIdArr[1]);
+
+            const itemToEdit = ItemCtrl.getItemById(id);
+
+            // Mise à jour de l'élément courant
+
+            ItemCtrl.setCurrentItem(itemToEdit);
+
+        }
 
    }
 

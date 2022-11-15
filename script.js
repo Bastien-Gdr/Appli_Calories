@@ -88,6 +88,12 @@ const ItemCtrl = (function(){
 
         },
 
+        getCurrentItem : function(){
+
+            return data.currentItem;
+
+        },
+
         getTotalCalories : function(){
             let total = 0;
 
@@ -204,6 +210,15 @@ const UiCtrl = (function(){
 
         },
 
+        addItemToForm : function(){
+            
+            document.querySelector(UiSelectors.itemNameInput).value = ItemCtrl.getCurrentItem().name;
+            document.querySelector(UiSelectors.itemCaloriesInput).value = ItemCtrl.getCurrentItem().calories;
+
+            UiCtrl.showEditState();
+
+        },
+
         clearEditState : function(){
 
             document.querySelector(UiSelectors.updateBtn).style.display = 'none';
@@ -304,7 +319,13 @@ const App = (function(ItemCtrl,UiCtrl){
 
             ItemCtrl.setCurrentItem(itemToEdit);
 
+            // Ajout de l'élément dans le formulaire
+
+            UiCtrl.addItemToForm();
+
         }
+
+        e.preventDefault();
 
    }
 

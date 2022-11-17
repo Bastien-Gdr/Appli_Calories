@@ -82,6 +82,25 @@ const ItemCtrl = (function(){
 
         },
 
+        updateItem : function(name,calories){
+
+            // Calories => nombre
+            calories = parseInt(calories);
+            
+            let found = null;
+
+            data.items.forEach(function(item){
+                if(item.id === data.currentItem.id){
+                    item.name = name;
+                    item.calories = calories;
+                    found = item;
+                }
+            });
+
+            return found;
+
+        },
+
         setCurrentItem : function(item){
 
             data.currentItem = item;
@@ -130,6 +149,7 @@ const UiCtrl = (function(){
 
     const UiSelectors = {
         itemList : '#item-list',
+        listItems : '#item-list li',
         addBtn : '.add-btn',
         deleteBtn : '.delete-btn',
         updateBtn : '.update-btn',
@@ -188,6 +208,28 @@ const UiCtrl = (function(){
             // Rattacher les li à la ul (#item-list)
 
             document.querySelector(UiSelectors.itemList).insertAdjacentElement('beforeend',li);
+
+        },
+
+        updateListItem : function(item){
+
+            let listItems = document.querySelectorAll(UiSelectors.listItems);
+
+            // Convertir en tableau toutes les li (id)
+            listItems = Array.from(listItems);
+
+            // boucle
+            listItems.forEach(function(listItem){
+
+                const itemID = listItem.getAttribute('id');
+
+                if(itemID === `item-${item.id}`){
+                    document.querySelector(`#${itemID}`).innerHTML = 
+                    `<strong>${item.name} : </strong> <em>${item.calories} calories</em>
+                        <a href="#"><i class="fas fa-pencil-alt"></i></a>`;
+                }
+
+            });
 
         },
 
@@ -264,6 +306,10 @@ const App = (function(ItemCtrl,UiCtrl){
 
         document.querySelector(UiSelectors.itemList).addEventListener('click',itemUpdateSubmit);
 
+        // MAJ éléments
+
+        document.querySelector(UiSelectors.updateBtn).addEventListener('click',itemUpdateList);
+
    }
 
    const itemAddSubmit = function(e){
@@ -327,6 +373,22 @@ const App = (function(ItemCtrl,UiCtrl){
 
         e.preventDefault();
 
+   }
+
+   const itemUpdateList = function(e){
+
+    // Identification du champ en question
+
+    const input = UiCtrl.getItemInput();
+
+    // Mettre à jour les éléments
+    const updatedItem = ItemCtrl.updateItem(input.name,input.calories);
+
+    // Mettre à jour l'UI
+
+    UiCtrl.updateListItem(updatedItem);
+
+    e.preventDefault();
    }
 
     // Méthodes publiques

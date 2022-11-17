@@ -133,6 +133,23 @@ const ItemCtrl = (function(){
 
         },
 
+        deleteItem : function(id){
+
+            // On va chercher les id
+            const ids = data.items.map(function(item){
+
+                return item.id;
+
+            });
+
+            // On va chercher l'index du tableau
+            const index = ids.indexOf(id);
+
+            // On supprime l'élément du tableau
+            data.items.splice(index,1);
+
+        },
+
         logData : function(){
             return data;
         }
@@ -240,6 +257,16 @@ const UiCtrl = (function(){
             
         },
 
+        deleteListItem : function(id){
+
+            const itemID = `#item-${id}`;
+
+            const item = document.querySelector(itemID);
+
+            item.remove();
+
+        },
+
         hideList : function(){
 
             document.querySelector(UiSelectors.itemList).style.display = 'none';
@@ -309,6 +336,12 @@ const App = (function(ItemCtrl,UiCtrl){
         // MAJ éléments
 
         document.querySelector(UiSelectors.updateBtn).addEventListener('click',itemUpdateList);
+
+        // boutton annuler
+        document.querySelector(UiSelectors.backBtn).addEventListener('click',UiCtrl.clearEditState);
+
+        // boutton supprimer
+        document.querySelector(UiSelectors.deleteBtn).addEventListener('click',itemDeleteSubmit);
 
    }
 
@@ -387,6 +420,37 @@ const App = (function(ItemCtrl,UiCtrl){
     // Mettre à jour l'UI
 
     UiCtrl.updateListItem(updatedItem);
+
+    // MAJ total calories
+    const totalCalories = ItemCtrl.getTotalCalories();
+
+    // Ajoute les calories à l'UI
+    UiCtrl.showTotalCalories(totalCalories);
+
+    UiCtrl.clearEditState();
+
+    e.preventDefault();
+   }
+
+   // Gestion du boutton supprimer
+   const itemDeleteSubmit = function(e){
+
+    const currentItem = ItemCtrl.getCurrentItem();
+
+    // Supprime l'élément courant des données
+
+    ItemCtrl.deleteItem(currentItem);
+
+    // Supprimer de l'UI
+    UiCtrl.deleteListItem(currentItem.id);
+
+    // MAJ total calories
+    const totalCalories = ItemCtrl.getTotalCalories();
+
+    // On ajoute le total dans l'UI
+    UiCtrl.showTotalCalories(totalCalories);
+
+    UiCtrl.clearEditState;
 
     e.preventDefault();
    }

@@ -42,6 +42,41 @@ const StorageCtrl = (function(){
             }
 
             return items;
+        },
+
+        updateItemStorage : function(updatedItem){
+
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function (item,index){
+
+                if(updatedItem.id === item.id){
+                    items.splice(index,1,updatedItem)
+                }
+
+            });
+
+            localStorage.setItem('items',JSON.stringify(items));
+        },
+
+        deleteItemFromStorage : function(id){
+
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function(item,index){
+
+                if(id === item.id){
+                    items.splice(index,1);
+                }
+
+            });
+
+            localStorage.setItem('items',JSON.stringify(items));
+        },
+
+        clearItemsFromStorage : function(){
+
+            localStorage.removeItem('items');
         }
 
     }
@@ -298,13 +333,6 @@ const UiCtrl = (function(){
 
         },
 
-        clearInput : function(){
-
-            document.querySelector(UiSelectors.itemNameInput).value = '';
-            document.querySelector(UiSelectors.itemCaloriesInput).value = '';
-            
-        },
-
         deleteListItem : function(id){
 
             const itemID = `#item-${id}`;
@@ -313,6 +341,13 @@ const UiCtrl = (function(){
 
             item.remove();
 
+        },
+
+        clearInput : function(){
+
+            document.querySelector(UiSelectors.itemNameInput).value = '';
+            document.querySelector(UiSelectors.itemCaloriesInput).value = '';
+            
         },
 
         removeItems : function(){
@@ -413,7 +448,7 @@ const App = (function(ItemCtrl,StorageCtrl,UiCtrl){
         // Vérification des champs
         if(input.name !== '' && input.calories !== ''){
 
-            const newItem = ItemCtrl.addItem(input.name,input.calories)
+            const newItem = ItemCtrl.addItem(input.name,input.calories);
         }
 
         //console.log('Ajout ok');
@@ -492,6 +527,9 @@ const App = (function(ItemCtrl,StorageCtrl,UiCtrl){
     // Ajoute les calories à l'UI
     UiCtrl.showTotalCalories(totalCalories);
 
+    // Mettre à jour le local Storage
+    StorageCtrl.updateItemStorage(updatedItem);
+
     UiCtrl.clearEditState();
 
     e.preventDefault();
@@ -511,9 +549,11 @@ const App = (function(ItemCtrl,StorageCtrl,UiCtrl){
 
     // MAJ total calories
     const totalCalories = ItemCtrl.getTotalCalories();
-
+    
     // On ajoute le total dans l'UI
     UiCtrl.showTotalCalories(totalCalories);
+
+    StorageCtrl.deleteItemFromStorage(currentItem.id);
 
     UiCtrl.clearEditState();
 
@@ -534,6 +574,10 @@ const App = (function(ItemCtrl,StorageCtrl,UiCtrl){
 
     // Suppression des éléments de l'UI
     UiCtrl.removeItems();
+
+    // suppression du local Storage
+    StorageCtrl.clearItemsFromStorage();
+
     }      
 
     // Méthodes publiques

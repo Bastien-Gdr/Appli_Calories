@@ -1,5 +1,52 @@
 // Controleur pour le stockage
+// fonction auto-lancée
+const StorageCtrl = (function(){
 
+    return{
+
+        storeItem : function(item){
+            let items;
+
+            // vérifier si l'élément existe déjà dans le local Storage
+            if(localStorage.getItem('items') === null){
+                items = [];
+                items.push(item);
+
+                // modification du local Storage pour inscrire le nouvel élément
+
+                localStorage.setItem('items',JSON.stringify(items));
+            }
+            else{
+                // aller chercher les élements se trouvant déjà dans le local Storage
+
+                items = JSON.parse(localStorage.getItem('items'));
+
+                items.push(item);
+
+                localStorage.setItem('items',JSON.stringify(items));
+
+            }
+        },
+
+        getItemsFromStorage : function(){
+
+            let items;
+
+            if(localStorage.getItem('items') === null ){
+
+                items =[];
+            }
+            else{
+
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+
+            return items;
+        }
+
+    }
+
+})();
 
 
 
@@ -18,11 +65,7 @@ const ItemCtrl = (function(){
     // Structure des données
 
     const data = {
-        items : [
-            // {id : 0,name : 'Pain',calories : 245},
-            // {id : 1,name : 'Orange',calories : 45},
-            // {id : 2,name : 'Poulet',calories : 100}
-        ],
+        items : StorageCtrl.getItemsFromStorage(),
 
         currentItem : null,
 
@@ -331,7 +374,7 @@ const UiCtrl = (function(){
 
 // Controleur Application
 
-const App = (function(ItemCtrl,UiCtrl){
+const App = (function(ItemCtrl,StorageCtrl,UiCtrl){
 
    // console.log(ItemCtrl.logData());
 
@@ -385,6 +428,10 @@ const App = (function(ItemCtrl,UiCtrl){
         // Afficher le total sur l'UI
 
         UiCtrl.showTotalCalories(totalCalories);
+
+        // Stockage dans le local Storage
+
+        StorageCtrl.storeItem(newItem);
 
         // Suppression des valeurs contenue dans les champs
 
@@ -524,6 +571,6 @@ const App = (function(ItemCtrl,UiCtrl){
             loadEventListeners();
         }
     }
-})(ItemCtrl,UiCtrl); // Sert à charger les deux controlleur automatiquement et donc pouvoir acceder à toutes les méthodes publiques
+})(ItemCtrl,StorageCtrl,UiCtrl); // Sert à charger les deux controlleur automatiquement et donc pouvoir acceder à toutes les méthodes publiques
 
 App.init();

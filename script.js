@@ -150,6 +150,10 @@ const ItemCtrl = (function(){
 
         },
 
+        clearAllItems : function(){
+            data.items = [];
+        },
+
         logData : function(){
             return data;
         }
@@ -171,6 +175,7 @@ const UiCtrl = (function(){
         deleteBtn : '.delete-btn',
         updateBtn : '.update-btn',
         backBtn : '.back-btn',
+        deleteAll : '.deleteAllBtn',
         itemNameInput : '#aliment',
         itemCaloriesInput : '#calories',
         totalCalories : '.total-calories'
@@ -267,6 +272,16 @@ const UiCtrl = (function(){
 
         },
 
+        removeItems : function(){
+
+            let listItems = document.querySelectorAll(UiSelectors.listItems);
+
+            listItems = Array.from(listItems);
+            listItems.forEach(function(item){
+                item.remove();
+            });
+        },
+
         hideList : function(){
 
             document.querySelector(UiSelectors.itemList).style.display = 'none';
@@ -342,6 +357,9 @@ const App = (function(ItemCtrl,UiCtrl){
 
         // boutton supprimer
         document.querySelector(UiSelectors.deleteBtn).addEventListener('click',itemDeleteSubmit);
+
+        // boutton tout supprimer
+        document.querySelector(UiSelectors.deleteAll).addEventListener('click',clearAllItemsClick);
 
    }
 
@@ -450,10 +468,26 @@ const App = (function(ItemCtrl,UiCtrl){
     // On ajoute le total dans l'UI
     UiCtrl.showTotalCalories(totalCalories);
 
-    UiCtrl.clearEditState;
+    UiCtrl.clearEditState();
+
+    // Suppression des valeurs à l'intérieur des champs
+
+    UiCtrl.clearInput();
 
     e.preventDefault();
    }
+
+   const clearAllItemsClick = function(){
+    // Suppression de tous les éléments de la structure contenus dans data
+    ItemCtrl.clearAllItems();
+
+    // Modifier le total de calories
+    const totalCalories = ItemCtrl.getTotalCalories();
+    UiCtrl.showTotalCalories(totalCalories);
+
+    // Suppression des éléments de l'UI
+    UiCtrl.removeItems();
+    }      
 
     // Méthodes publiques
     return{
